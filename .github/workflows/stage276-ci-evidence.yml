@@ -1,0 +1,42 @@
+name: stage276-ci-evidence
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci-evidence:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate CI summary
+        run: |
+          python3 tools/build_stage276_summary.py
+
+      - name: Verify CI evidence
+        run: |
+          python3 tools/verify_stage276_evidence.py
+
+      - name: Show generated files
+        run: |
+          ls -R out/ci_evidence
+          cat out/ci_evidence/stage276_summary.json
+          cat out/ci_evidence/verify_stage276_result.json
+
+      - name: Upload CI evidence artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage276-ci-evidence
+          path: out/ci_evidence/

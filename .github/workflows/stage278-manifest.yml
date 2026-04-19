@@ -1,0 +1,64 @@
+name: stage279-manifest
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  manifest-verification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install OpenTimestamps client
+        run: |
+          python -m pip install --upgrade pip
+          pip install opentimestamps-client
+
+      - name: Create output directory
+        run: mkdir -p out/stage279
+
+      - name: Build summary and sha256
+        run: |
+          python tools/build_stage279_manifest.py
+
+      - name: Stamp summary with OpenTimestamps
+        run: |
+          ots stamp out/stage279/summary.json
+
+      - name: Rebuild manifest after ots creation
+        run: |
+          python tools/build_stage279_manifest.py
+
+      - name: Verify manifest package
+        run: |
+          python tools/verify_stage279.py
+
+      - name: Show generated files
+        run: |
+          ls -la out/stage279
+          echo
+          cat out/stage279/summary.sha256
+          echo
+          python -m json.tool out/stage279/manifest.json
+
+      - name: Upload stage279 artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage279-manifest
+          path: |
+            out/stage279/summary.json
+            out/stage279/summary.sha256
+            out/stage279/summary.json.ots
+            out/stage279/manifest.json

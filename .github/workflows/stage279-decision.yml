@@ -1,0 +1,36 @@
+name: stage279-decision
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  external-reproducible-decision:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build decision artifact
+        run: |
+          python3 tools/build_stage279_decision.py
+
+      - name: Verify reproducible decision
+        run: |
+          python3 tools/verify_stage279_decision.py
+
+      - name: Upload decision artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage279-decision-artifacts
+          path: |
+            out/stage279/evidence_summary.json
+            out/stage279/decision.json
+            out/stage279/decision.sha256
