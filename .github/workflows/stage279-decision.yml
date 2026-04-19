@@ -18,6 +18,10 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Check required input exists
+        run: |
+          test -f out/stage279/evidence_summary.json
+
       - name: Build decision artifact
         run: |
           python3 tools/build_stage279_decision.py
