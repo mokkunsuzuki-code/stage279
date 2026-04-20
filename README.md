@@ -96,6 +96,20 @@ integrity verification via SHA256
 
 No manual steps required.
 
+Public Verification URL
+
+A public verification page is available via GitHub Pages.
+
+After Pages deployment, the verification page will be available at:
+
+https://mokkunsuzuki-code.github.io/stage279/
+
+This page shows:
+
+final decision
+trust scores
+verification run link
+one-command external verification path
 What This Stage Proves
 The final decision is deterministic
 Anyone can reproduce the same result

@@ -1,0 +1,52 @@
+name: stage279-pages
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Ensure decision exists
+        run: |
+          test -f out/stage279/evidence_summary.json
+          python3 tools/build_stage279_decision.py
+          test -f out/stage279/decision.json
+
+      - name: Prepare Pages artifact
+        run: |
+          mkdir -p _site
+          cp -R docs/* _site/
+          mkdir -p _site/out/stage279
+          cp out/stage279/decision.json _site/out/stage279/decision.json
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy-pages:
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    needs: build-pages
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
