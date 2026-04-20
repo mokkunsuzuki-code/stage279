@@ -1,32 +1,28 @@
-# Stage279: VEP Externalized Decision Reproduction
+Stage279: VEP Externalized Decision Reproduction
 
 ## Overview
 
-Stage279 makes the final VEP-style decision externally reproducible.
+Stage279 introduces externally reproducible decision verification.
 
-This is the first stage where a third party can independently reproduce:
+This stage enables third parties to independently reproduce:
 
-- the input evidence summary
-- the gate calculation
-- the final decision: `accept`, `pending`, or `reject`
+- evidence input
+- trust scoring
+- final decision (accept / pending / reject)
 
-In other words, this stage turns the decision itself into a verifiable artifact.
+The decision is no longer an interpretation — it is a deterministic artifact.
 
 ---
 
-## What This Stage Adds
+## Key Concept
 
-Stage279 adds:
+From evidence → score → decision
 
-- `evidence_summary.json` as the normalized input
-- deterministic decision generation
-- `decision.json` as the final fixed output
-- `decision.sha256` for integrity checking
-- an external verification script that recomputes the decision independently
+All steps are:
 
-This transforms:
-
-- score model → reproducible decision artifact
+- deterministic
+- reproducible
+- verifiable outside the original environment
 
 ---
 
@@ -34,26 +30,28 @@ This transforms:
 
 Immediate Gate:
 
-`integrity × execution × identity`
+integrity × execution × identity
 
 Settlement Gate:
 
-`time`
+time
 
-Decision rules:
+---
 
-- `accept`
+## Decision Rules
+
+- **accept**
   - integrity = 1.0
   - execution = 1.0
   - identity = 1.0
   - time_trust = 1.0
 
-- `pending`
-  - immediate gate fully satisfied
-  - time trust exists but is not fully settled
+- **pending**
+  - immediate gate satisfied
+  - time trust exists but not fully settled
 
-- `reject`
-  - one or more gate conditions failed
+- **reject**
+  - one or more conditions failed
 
 ---
 
@@ -67,30 +65,38 @@ Decision rules:
 
 ---
 
-## How to Run
+## How to Reproduce
 
-Generate the decision artifact:
+### 1. Generate decision
 
 ```bash
 python3 tools/build_stage279_decision.py
-
-Verify the decision independently:
-
+2. Verify decision
 python3 tools/verify_stage279_decision.py
+External Verification
+
+Example using GitHub Actions artifact:
+
+python3 tools/verify_stage279_decision.py \
+  --summary evidence_summary.json \
+  --decision decision.json \
+  --sha256 decision.sha256
 What This Stage Proves
-The final decision is no longer just a visual interpretation
-The decision can be reproduced mechanically from normalized evidence
-A third party can recompute the same result independently
-The result can be integrity-checked using SHA-256
-Important Accuracy
+The final decision is deterministic
+Anyone can reproduce the same result
+The result is integrity-protected via SHA-256
+No manual interpretation is required
+Important Note
 
-This stage does not prove that the underlying evidence is universally true.
+This stage does NOT prove that:
 
-It proves something narrower and more important for external review:
+the evidence itself is universally correct
 
-given the same normalized evidence input,
-the same decision is reproduced deterministically,
-and the published decision artifact has not been altered.
+It proves that:
+
+given the same input,
+the same decision is always produced,
+and the published result has not been altered
 License
 
 MIT License
