@@ -293,7 +293,7 @@ python3 tools/verify_stage279_decision.py \
   <script>
     async function loadDecision() {
       try {
-        const res = await fetch('../out/stage279/decision.json', { cache: 'no-store' });
+        const res = await fetch('out/stage279/decision.json', { cache: 'no-store' });
         if (!res.ok) throw new Error('decision.json not found');
         const data = await res.json();
 
@@ -316,7 +316,7 @@ python3 tools/verify_stage279_decision.py \
           JSON.stringify(data, null, 2);
       } catch (err) {
         document.getElementById('decisionJson').textContent =
-          'decision.json could not be loaded from ../out/stage279/decision.json';
+          'decision.json could not be loaded from out/stage279/decision.json';
       }
     }
 
