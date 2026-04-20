@@ -1,4 +1,4 @@
-Stage279: VEP Externalized Decision Reproduction
+# Stage279: VEP Externalized Decision Reproduction
 
 ## Overview
 
@@ -67,20 +67,35 @@ time
 
 ## How to Reproduce
 
-### 1. Generate decision
+### Generate decision
 
 ```bash
 python3 tools/build_stage279_decision.py
-2. Verify decision
+Verify decision
 python3 tools/verify_stage279_decision.py
-External Verification
+Quick External Verification (One Command)
 
-Example using GitHub Actions artifact:
+You can reproduce the decision externally using GitHub Actions artifacts.
 
+git clone https://github.com/mokkunsuzuki-code/stage279.git && \
+cd stage279 && \
+RUN_ID=$(gh run list --workflow stage279-decision --limit 1 --json databaseId -q '.[0].databaseId') && \
+rm -rf downloaded_stage279_decision && \
+mkdir -p downloaded_stage279_decision && \
+gh run download $RUN_ID --dir downloaded_stage279_decision && \
 python3 tools/verify_stage279_decision.py \
-  --summary evidence_summary.json \
-  --decision decision.json \
-  --sha256 decision.sha256
+  --summary downloaded_stage279_decision/stage279-decision-artifacts/evidence_summary.json \
+  --decision downloaded_stage279_decision/stage279-decision-artifacts/decision.json \
+  --sha256 downloaded_stage279_decision/stage279-decision-artifacts/decision.sha256
+
+This performs:
+
+artifact download from GitHub Actions
+independent recomputation of the decision
+integrity verification via SHA256
+
+No manual steps required.
+
 What This Stage Proves
 The final decision is deterministic
 Anyone can reproduce the same result
